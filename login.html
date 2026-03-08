@@ -34,6 +34,7 @@
         }
         .login-form .form-group {
             margin-bottom: 20px;
+            position: relative;
         }
         .login-form input {
             width: 100%;
@@ -46,6 +47,14 @@
         .login-form input:focus {
             outline: none;
             border-color: #667eea;
+        }
+        /* Ocultar el honeypot */
+        .honeypot {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+            height: 0;
+            width: 0;
         }
         .login-btn {
             width: 100%;
@@ -93,13 +102,36 @@
                 ❌ Código o contraseña incorrectos
             </div>
             
-            <form class="login-form" onsubmit="iniciarSesion(event)" autocomplete="off">
+            <!-- Formulario con múltiples protecciones anti-autofill -->
+            <form class="login-form" id="login-form" onsubmit="iniciarSesion(event)" autocomplete="off" readonly>
+                <!-- Honeypot para engañar a los bots y autofill -->
+                <input type="text" name="fake_username" class="honeypot" tabindex="-1" autocomplete="off">
+                <input type="password" name="fake_password" class="honeypot" tabindex="-1" autocomplete="off">
+                
                 <div class="form-group">
-                    <input type="text" id="login-codigo" placeholder="Código de cajero" 
-                           required autofocus autocomplete="off">
+                    <input type="text" 
+                           id="login-codigo" 
+                           name="login-codigo"
+                           placeholder="Código de cajero" 
+                           required 
+                           autofocus 
+                           autocomplete="off"
+                           autocorrect="off"
+                           autocapitalize="off"
+                           spellcheck="false"
+                           data-lpignore="true">
                 </div>
                 <div class="form-group">
-                    <input type="password" id="login-password" placeholder="Contraseña" required autocomplete="off">
+                    <input type="password" 
+                           id="login-password" 
+                           name="login-password"
+                           placeholder="Contraseña" 
+                           required 
+                           autocomplete="new-password"
+                           autocorrect="off"
+                           autocapitalize="off"
+                           spellcheck="false"
+                           data-lpignore="true">
                 </div>
                 <button type="submit" class="login-btn">🔐 Iniciar Sesión</button>
             </form>
@@ -124,8 +156,37 @@
             if (obtenerSesionActiva()) {
                 window.location.href = 'index.html';
             }
+            
+            // Prevenir autofill: limpiar campos después de un breve delay
+            setTimeout(() => {
+                const codigoInput = document.getElementById('login-codigo');
+                const passwordInput = document.getElementById('login-password');
+                
+                if (codigoInput) {
+                    codigoInput.value = '';
+                    codigoInput.setAttribute('readonly', 'readonly');
+                    setTimeout(() => codigoInput.removeAttribute('readonly'), 100);
+                }
+                if (passwordInput) {
+                    passwordInput.value = '';
+                    passwordInput.setAttribute('readonly', 'readonly');
+                    setTimeout(() => passwordInput.removeAttribute('readonly'), 100);
+                }
+            }, 100);
+            
+            // Cambiar el name attribute dinámicamente para confundir al navegador
+            const form = document.getElementById('login-form');
+            const timestamp = Date.now();
+            const codigoInput = document.getElementById('login-codigo');
+            const passwordInput = document.getElementById('login-password');
+            
+            if (codigoInput) {
+                codigoInput.name = 'user_' + timestamp;
+            }
+            if (passwordInput) {
+                passwordInput.name = 'pass_' + timestamp;
+            }
         });
     </script>
 </body>
 </html>
-
