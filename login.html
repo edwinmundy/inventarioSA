@@ -106,7 +106,7 @@
             
             <div class="login-info">
                 <p>💡 Usuario por defecto:</p>
-                <p>ADMIN</p>
+                <p>ADMIN / 637177</p>
             </div>
         </div>
     </div>
@@ -114,15 +114,17 @@
     <script src="js/app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-        // Solo inicializar si no hay datos (primera vez)
+            // Solo inicializar datos si no existen cajeros (primera vez)
             if (!localStorage.getItem('inventario_cajeros')) {
-         inicializarDatos();
-    }
-    
-    // Verificar sesión después
-    if (!verificarSesion()) return;
-    cargarCajeros();
-});
+                console.log('Primera vez: inicializando datos...');
+                inicializarDatos();
+            }
+            
+            // Verificar si ya hay sesión activa
+            if (obtenerSesionActiva()) {
+                window.location.href = 'index.html';
+            }
+        });
     </script>
 </body>
 </html>
