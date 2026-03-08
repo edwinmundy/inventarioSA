@@ -1206,8 +1206,21 @@ function mostrarTab(tab) {
 
 function actualizarDashboard() {
     const categorias = obtenerCategorias();
-    const grid = document.getElementById('stats-grid');
     
+    // Verificar si estamos en index.html con el dashboard dividido personalizado
+    // En ese caso, no interferir con cargarDashboardDividido()
+    if (document.getElementById('inventory-categories')) {
+        // Solo actualizar el panel de administración si existe
+        const adminPanel = document.querySelector('.panel-admin .admin-list');
+        if (adminPanel) {
+            // El dashboard dividido ya maneja todo, solo asegurar navegación
+            actualizarNavegacion();
+        }
+        return;
+    }
+    
+    // Panel de stats-grid (para otras páginas que usen este ID)
+    const grid = document.getElementById('stats-grid');
     if (!grid) return;
     
     let html = '';
@@ -1370,4 +1383,5 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
 
