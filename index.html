@@ -110,8 +110,16 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // CORRECCIÓN 1: Solo inicializar si no hay datos (primera vez)
+            if (!localStorage.getItem('inventario_cajeros')) {
+                console.log('Primera vez: inicializando datos...');
+                inicializarDatos();
+            }
+            
+            // CORRECCIÓN 2: Verificar sesión DESPUÉS de inicializar
             if (!verificarSesion()) return;
-            inicializarDatos();
+            
+            // CORRECCIÓN 3: Cargar dashboard sin llamar inicializarDatos() de nuevo
             cargarDashboardDividido();
 
             // Desactivar autocomplete global
@@ -152,7 +160,7 @@
                 }
                 
                 return `
-                    <a href="${cat.id}.html" class="category-card ${estadoClase}">
+                    <a href="categoria.html?cat=${cat.id}" class="category-card ${estadoClase}">
                         <div class="category-icon">${cat.icono}</div>
                         <div class="category-info">
                             <div class="category-name">${cat.nombre}</div>
