@@ -31,7 +31,7 @@ const DATOS_DEFAULT = {
             rut: '0.000.000-0', 
             turno: 'ADMIN', 
             codigo: 'ADMIN', 
-            password: '637177',
+            password: '63717',
             cargo: 'Corporativo',
             activo: true 
         }
@@ -443,7 +443,7 @@ function asegurarAdminExiste() {
             rut: '0.000.000-0',
             turno: 'ADMIN',
             codigo: 'ADMIN',
-            password: '637177',
+            password: '63717',
             cargo: 'Corporativo',
             activo: true
         });
@@ -1370,3 +1370,4 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
