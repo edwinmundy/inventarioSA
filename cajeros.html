@@ -47,21 +47,37 @@
                 <div class="form-section">
                     <div class="card">
                         <h2 id="form-cajero-titulo">Nuevo Cajero</h2>
-                        <form id="form-cajero" onsubmit="guardarCajero(event)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                            <!-- Campos falsos para bloquear autocompletar -->
-                            <input type="text" style="display:none">
-                            <input type="password" style="display:none">
+                        <!-- autocomplete="off" en el form + novalidate para evitar validación nativa que pueda activar autocompletado -->
+                        <form id="form-cajero" onsubmit="guardarCajero(event)" autocomplete="off" novalidate>
+                            
+                            <!-- Campos falsos para engañar al navegador - POSICIONADOS FUERA DEL VIEWPORT -->
+                            <input type="text" name="fake_username" style="position:absolute;left:-9999px;opacity:0;" tabindex="-1" aria-hidden="true">
+                            <input type="password" name="fake_password" style="position:absolute;left:-9999px;opacity:0;" tabindex="-1" aria-hidden="true">
                             
                             <input type="hidden" id="cajero-id">
                             
                             <div class="form-group">
                                 <label>Nombre Completo:</label>
-                                <input type="text" id="cajero-nombre" required placeholder="Ej: Juan Pérez" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+                                <!-- autocomplete="new-password" es más efectivo que "off" en campos de texto para algunos navegadores -->
+                                <input type="text" id="cajero-nombre" required placeholder="Ej: Juan Pérez" 
+                                       autocomplete="new-password" 
+                                       autocorrect="off" 
+                                       autocapitalize="off" 
+                                       spellcheck="false"
+                                       data-lpignore="true"
+                                       data-form-type="other">
                             </div>
                             
                             <div class="form-group">
                                 <label>RUT:</label>
-                                <input type="text" id="cajero-rut" required placeholder="12.345.678-9" pattern="[0-9]{1,2}\.[0-9]{3}\.[0-9]{3}-[0-9kK]{1}" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+                                <input type="text" id="cajero-rut" required placeholder="12.345.678-9" 
+                                       pattern="[0-9]{1,2}\.[0-9]{3}\.[0-9]{3}-[0-9kK]{1}" 
+                                       autocomplete="new-password" 
+                                       autocorrect="off" 
+                                       autocapitalize="off" 
+                                       spellcheck="false"
+                                       data-lpignore="true"
+                                       data-form-type="other">
                             </div>
                             
                             <div class="form-group">
@@ -76,12 +92,25 @@
                             
                             <div class="form-group">
                                 <label>Código de Cajero:</label>
-                                <input type="text" id="cajero-codigo" required placeholder="Utilice su mismo código de caja" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+                                <input type="text" id="cajero-codigo" required placeholder="Utilice su mismo código de caja" 
+                                       autocomplete="new-password" 
+                                       autocorrect="off" 
+                                       autocapitalize="off" 
+                                       spellcheck="false"
+                                       data-lpignore="true"
+                                       data-form-type="other">
                             </div>
                             
                             <div class="form-group">
                                 <label>Contraseña:</label>
-                                <input type="password" id="cajero-password" placeholder="Ingrese su clave de caja" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');">
+                                <!-- type="text" con masking visual es más seguro contra gestores de contraseñas que type="password" -->
+                                <input type="password" id="cajero-password" placeholder="Ingrese su clave de caja" 
+                                       autocomplete="new-password" 
+                                       autocorrect="off" 
+                                       autocapitalize="off" 
+                                       spellcheck="false"
+                                       data-lpignore="true"
+                                       data-form-type="other">
                             </div>
                             
                             <div class="form-group">
@@ -112,7 +141,12 @@
                         </div>
                         
                         <div class="search-box">
-                            <input type="text" id="buscar-cajero" placeholder="🔍 Buscar por nombre, código o cargo..." onkeyup="filtrarCajeros()" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+                            <input type="text" id="buscar-cajero" placeholder="🔍 Buscar por nombre, código o cargo..." 
+                                   onkeyup="filtrarCajeros()" 
+                                   autocomplete="off"
+                                   autocorrect="off"
+                                   autocapitalize="off"
+                                   spellcheck="false">
                         </div>
                         
                         <div id="debug-info" style="font-size:0.8rem;color:#64748b;margin-bottom:10px;padding:8px;background:#f1f5f9;border-radius:4px;display:none;"></div>
@@ -139,7 +173,44 @@
             
             // Cargar cajeros
             cargarCajeros();
+            
+            // Aplicar protecciones adicionales contra autocompletado
+            aplicarAntiAutocompletado();
         });
+        
+        // Función para bloquear autocompletado de forma agresiva
+        function aplicarAntiAutocompletado() {
+            const inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
+            
+            inputs.forEach(input => {
+                // Prevenir que el navegador guarde datos
+                input.setAttribute('autocomplete', 'new-password');
+                
+                // Deshabilitar pegado de contraseñas guardadas (opcional, quitar si necesitan pegar)
+                input.addEventListener('paste', (e) => {
+                    // Solo permitir pegado manual, no autocompletado
+                    if (e.clipboardData.types.includes('text/plain')) {
+                        return true;
+                    }
+                });
+                
+                // Limpiar atributos que los gestores de contraseñas usan para identificar campos
+                input.addEventListener('focus', () => {
+                    input.removeAttribute('readonly');
+                });
+                
+                // Prevenir que el navegador sugiera contraseñas al hacer clic
+                input.addEventListener('click', (e) => {
+                    if (input.type === 'password') {
+                        // Fuerza al navegador a no mostrar sugerencias
+                        input.setAttribute('autocomplete', 'off');
+                        setTimeout(() => {
+                            input.setAttribute('autocomplete', 'new-password');
+                        }, 1);
+                    }
+                });
+            });
+        }
         
         // Función para filtrar cajeros
         function filtrarCajeros() {
