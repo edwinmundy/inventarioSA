@@ -110,26 +110,24 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // CORRECCIÓN 1: Solo inicializar si no hay datos (primera vez)
-            if (!localStorage.getItem('inventario_cajeros')) {
-                console.log('Primera vez: inicializando datos...');
-                inicializarDatos();
-            }
-            
-            // CORRECCIÓN 2: Verificar sesión DESPUÉS de inicializar
-            if (!verificarSesion()) return;
-            
-            // CORRECCIÓN 3: Cargar dashboard sin llamar inicializarDatos() de nuevo
-            cargarDashboardDividido();
-
-            // Desactivar autocomplete global
-            document.querySelectorAll('input, textarea, select').forEach(el => {
-                el.setAttribute('autocomplete','off');
-                el.setAttribute('autocorrect','off');
-                el.setAttribute('autocapitalize','off');
-                el.setAttribute('spellcheck','false');
-            });
-        });
+    // CORRECCIÓN 1: Solo inicializar si no hay datos (primera vez)
+    if (!localStorage.getItem('inventario_cajeros')) {
+        console.log('Primera vez: inicializando datos...');
+        inicializarDatos();
+    } else {
+        // Solo actualizar navegación y usuario, no todo el dashboard
+        actualizarNavegacion();
+        mostrarUsuarioActual();
+    }
+    
+    // CORRECCIÓN 2: Verificar sesión DESPUÉS de inicializar
+    if (!verificarSesion()) return;
+    
+    // CORRECCIÓN 3: Cargar dashboard personalizado de index (no el de app.js)
+    cargarDashboardDividido();
+    
+    // NO llamar actualizarDashboard() aquí, ya que cargarDashboardDividido() hace todo
+});
 
         function cargarDashboardDividido() {
             const categorias = obtenerCategorias();
@@ -190,3 +188,4 @@
     </script>
 </body>
 </html>
+
