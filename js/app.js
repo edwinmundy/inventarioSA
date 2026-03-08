@@ -309,6 +309,7 @@ function obtenerSesionActiva() {
 function iniciarSesion(event) {
     event.preventDefault();
     
+    // Solo asegurar admin en login si no hay cajeros
     asegurarAdminExiste();
     
     const codigo = document.getElementById('login-codigo').value.toUpperCase().trim();
@@ -401,7 +402,7 @@ function inicializarDatos() {
     });
     
     // Inicializar cajeros - VERSIÓN CORREGIDA
-    // Solo crear admin si NO existe NINGÚN cajero guardado
+    // Solo crear admin si NO existe NINGÚN cajero guardado (primera vez)
     const cajerosKey = STORAGE_KEYS.cajeros;
     const cajerosExistentes = localStorage.getItem(cajerosKey);
     
@@ -416,10 +417,6 @@ function inicializarDatos() {
     if (!localStorage.getItem(STORAGE_KEYS.auditoria)) {
         localStorage.setItem(STORAGE_KEYS.auditoria, JSON.stringify([]));
     }
-    
-    // Asegurar admin existe solo si no hay ningún cajero (primera vez)
-    // Comentado porque ya se maneja arriba
-    // asegurarAdminExiste();
     
     actualizarNavegacion();
     mostrarUsuarioActual();
@@ -453,6 +450,7 @@ function asegurarAdminExiste() {
         guardarDatos('cajeros', cajeros);
     }
 }
+
 // ==========================================
 // NAVEGACIÓN DINÁMICA ACTUALIZADA
 // ==========================================
@@ -945,8 +943,6 @@ function limpiarAuditoria() {
 function cargarCajeros() {
     const contenedor = document.getElementById('lista-cajeros');
     if (!contenedor) return;
-    
-    asegurarAdminExiste();
     
     const cajeros = obtenerDatos('cajeros');
     
