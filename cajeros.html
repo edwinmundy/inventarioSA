@@ -174,7 +174,10 @@
             
             // Verificar sesión
             if (!verificarSesion()) return;
-            
+
+            actualizarNavegacion();
+
+            mostrarUsuarioActual();
             // Cargar cajeros
             cargarCajeros();
             
@@ -229,5 +232,6 @@
     </script>
 </body>
 </html>
+
 
 
